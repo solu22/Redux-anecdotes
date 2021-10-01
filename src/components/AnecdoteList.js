@@ -5,10 +5,16 @@ import { setNotification,removeNotification } from '../reducers/notificationRedu
 
 
 const AnecdoteList = () => {
-    const anecdotes = useSelector((state) => state.anecdoteReducer)
-    const dispatch = useDispatch()
-
-  const add = (id) => {
+   
+    const anecdotes = useSelector(state=>{
+        if(state.filterReducer===null){
+            return state.anecdoteReducer
+        }
+        return state.anecdoteReducer.filter((anec)=>anec.content.toLowerCase().includes(state.filterReducer.toLowerCase()))
+    
+    })
+const dispatch = useDispatch() 
+const add = (id) => {
     dispatch(addVote(id))
     const findAnec = anecdotes.find(anec=>anec.id===id)
     const content = findAnec? findAnec.content:null
@@ -20,7 +26,7 @@ const AnecdoteList = () => {
     return (
         <div>
             <h2>Anecdotes</h2>
-      {anecdotes.map(anecdote =>
+      {anecdotes?.map(anecdote =>
         <div key={anecdote.id}>
           <div>
             {anecdote.content}
