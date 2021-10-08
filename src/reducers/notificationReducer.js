@@ -25,4 +25,11 @@ export const removeNotification = () => {
   }
 };
 
+export const notify = (message)=>async(dispatch)=>{
+  await dispatch(setNotification(message))
+  setTimeout(() => 
+    async()=> await dispatch(removeNotification())
+  , 3000);
+}
+
 export default notificationReducer;

@@ -1,46 +1,50 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+
 import { addVote } from "../reducers/anecdoteReducer";
+import { connect } from "react-redux";
+import { notify } from "../reducers/notificationReducer";
 
-import {
-  setNotification,
-  removeNotification,
-} from "../reducers/notificationReducer";
+const Anecdote = ({ anec, handleClick }) => (
+  <div>
+    <div>{anec && anec.content}</div>
+    <div>
+      has {anec && anec.content}
+      <button onClick={handleClick}>Vote this one</button>
+    </div>
+  </div>
+);
 
-const AnecdoteList = () => {
-  const anecdotes = useSelector((state) => {
-    if (state.filterReducer) {
-      return state.anecdoteReducer.filter((a) =>
-        a.content.includes(state.filterReducer)
-      );
-    }
-    return (state.anecdoteReducer)
-  });
-  const dispatch = useDispatch();
-  anecdotes.sort((a,b)=>b.votes-a.votes)
-
-  const vote = (anectode) => {
-    dispatch(addVote(anectode));
-    dispatch(setNotification(`you voted ${anectode.content}`));
-    setTimeout(() => {
-      dispatch(removeNotification());
-    }, 5000);
+const AnecdoteList = (props) => {
+  const handleVote = (anectode) => {
+    props.addVote(anectode);
+    props.notify(`You voted ${anectode.content}`);
   };
 
   return (
     <>
       <h2>Anecdotes</h2>
-      {anecdotes.length>0 && anecdotes.map((anecdote) => (
-        <div key={anecdote.id}>
-          <div>{anecdote?.content}</div>
-          <div>has {anecdote?.votes}</div>
-          <div>
-            <button onClick={() => vote(anecdote)}>Vote this one</button>
-          </div>
-        </div>
+
+      {props.anecdotes.map((anecdote) => (
+        <Anecdote
+          key={anecdote.id}
+          anec={anecdote}
+          handleClick={() => handleVote(anecdote)}
+        />
       ))}
     </>
   );
 };
 
-export default AnecdoteList;
+const mapStateToProps = (state) => {
+  let anec = state.anecdoteReducer;
+
+  if (state.filterReducer) {
+    anec = state.anecdoteReducer.filter((an) =>
+      an.content.includes(state.filterReducer)
+    );
+  }
+
+  return { anecdotes: anec };
+};
+
+export default connect(mapStateToProps, { addVote, notify })(AnecdoteList);
