@@ -1,12 +1,12 @@
 import React from 'react'
 import {useDispatch } from 'react-redux'
-import { createAnec } from '../reducers/anecdoteReducer'
 import { removeNotification, setNotification } from '../reducers/notificationReducer';
+import { createAnec } from '../reducers/anecdoteReducer';
 
 const AnecdoteForm = () => {
     const dispatch = useDispatch()
 
-    const addAnecdote= (e)=>{
+    const addAnecdote= async (e)=>{
         e.preventDefault()
         const content = e.target.input.value
         dispatch(createAnec(content))

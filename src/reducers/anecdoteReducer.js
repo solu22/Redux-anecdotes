@@ -1,55 +1,52 @@
-const anecdotesAtStart = [
-  'If it hurts, do it more often',
-  'Adding manpower to a late software project makes it later!',
-  'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
-  'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
-  'Premature optimization is the root of all evil.',
-  'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
-]
+import anecService from '../services/anecdotes'
 
-const getId = () => (100000 * Math.random()).toFixed(0)
-
-export const asObject = (anecdote) => {
-  return {
-    content: anecdote,
-    id: getId(),
-    votes: 0
-  }
-}
-
-const initialState = anecdotesAtStart.map(asObject)
-
-const anecdoteReducer = (state = initialState, action) => {
+const anecdoteReducer = (state = [], action) => {
   switch (action.type) {
-    case 'ADD_VOTE':
-      const toBeVoted = state.find((anec)=> anec.id === action.payload)
-      const voteIt = {...toBeVoted, votes:toBeVoted.votes+1}
-      const afterVote= state.map((anec)=>anec.id!== voteIt.id ? anec: voteIt)
-      return afterVote.sort((a,b)=>b.votes-a.votes)
+     case 'ADD_VOTE':
+      
+      return state.map((anec)=>anec.id!== action.payload ? anec: action.payload)
+    
 
     case'CREATE ANECDOTE':
       return [...state, action.payload]
+    
+      case 'INIT':
+        return action.payload
+
     default:
       return state;
-  }
+ }
 
  
 }
 
-//action creator
 
-export const addVote = (id)=>{
-  return {
-    type: 'ADD_VOTE',
-    payload: id
+export const initialAnecdotes = ()=> async (dispatch) => {
+    const dotes = await anecService.getAll()
+    dispatch({
+      type:'INIT',
+      payload: dotes
+    })
   }
+
+
+
+
+export const addVote = (sanec)=> async(dispatch)=>{
+  const anec = await anecService.updateVote({...sanec, votes:sanec.votes+1})
+  dispatch({
+    type: 'ADD_VOTE',
+    payload: anec,
+  })
 }
 
-export const createAnec = (content)=>{
-  return {
+export const createAnec = (content)=>async(dispatch)=>{
+
+  const data = await anecService.create(content)
+  dispatch({
     type: 'CREATE ANECDOTE',
-    payload: asObject(content)
-  }
+    payload: data,
+  })
 }
 
 export default anecdoteReducer

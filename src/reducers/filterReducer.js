@@ -1,4 +1,3 @@
-
 const initialState = null
 
 const filterReducer = (state=initialState, action)=>{
